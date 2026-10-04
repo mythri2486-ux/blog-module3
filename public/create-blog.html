@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Blog - My Blog</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+
+        <h1>My Blog</h1>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="create-blog.html">Create Blog</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <h2>Create New Blog</h2>
+
+        <form id="blogForm">
+
+            <label>Blog Title</label>
+
+            <input
+                type="text"
+                id="title"
+                placeholder="Enter blog title"
+                required
+            >
+
+
+            <label>Blog Content</label>
+
+            <textarea
+                id="content"
+                rows="10"
+                placeholder="Write your blog here..."
+                required
+            ></textarea>
+
+
+            <button type="submit">
+                Publish Blog
+            </button>
+
+        </form>
+
+        <p id="message"></p>
+
+    </main>
+
+
+    <script>
+
+        const token = localStorage.getItem("token");
+
+
+        // Check login
+        if (!token) {
+
+            window.location.href = "login.html";
+
+        }
+
+
+        const form =
+            document.getElementById("blogForm");
+
+
+        form.addEventListener(
+            "submit",
+            async function(event) {
+
+                event.preventDefault();
+
+
+                const title =
+                    document.getElementById("title").value;
+
+                const content =
+                    document.getElementById("content").value;
+
+                const message =
+                    document.getElementById("message");
+
+
+                try {
+
+                    const response = await fetch(
+                        "/api/blogs",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+
+                                "Authorization":
+                                    "Bearer " + token
+                            },
+
+                            body: JSON.stringify({
+                                title: title,
+                                content: content
+                            })
+                        }
+                    );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (response.ok) {
+
+                        message.textContent =
+                            "Blog created successfully!";
+
+                        form.reset();
+
+
+                        setTimeout(() => {
+
+                            window.location.href =
+                                "dashboard.html";
+
+                        }, 1000);
+
+                    } else {
+
+                        message.textContent =
+                            data.message;
+
+                    }
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    message.textContent =
+                        "Unable to connect to server.";
+
+                }
+
+            }
+        );
+
+
+        function logout() {
+
+            localStorage.removeItem("token");
+
+            localStorage.removeItem("user");
+
+            window.location.href =
+                "login.html";
+
+        }
+
+    </script>
+
+</body>
+
+</html>

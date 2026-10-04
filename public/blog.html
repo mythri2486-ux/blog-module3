@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Blog Details - My Blog</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+
+        <h1>My Blog</h1>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="create-blog.html">Create Blog</a>
+            <a href="login.html">Login</a>
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <div id="blogDetails">
+            Loading blog...
+        </div>
+
+    </main>
+
+
+    <script>
+
+        // Get blog ID from URL
+        const params =
+            new URLSearchParams(window.location.search);
+
+        const blogId =
+            params.get("id");
+
+
+        async function loadBlog() {
+
+            const container =
+                document.getElementById("blogDetails");
+
+
+            if (!blogId) {
+
+                container.innerHTML =
+                    "<p>Blog ID not found.</p>";
+
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(`/api/blogs/${blogId}`);
+
+
+                const blog =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    container.innerHTML =
+                        `<p>${blog.message}</p>`;
+
+                    return;
+                }
+
+
+                container.innerHTML = `
+
+                    <div class="blog-card">
+
+                        <h2>${blog.title}</h2>
+
+                        <p>
+                            <strong>Author:</strong>
+                            ${
+                                blog.author
+                                ? blog.author.name
+                                : "Unknown"
+                            }
+                        </p>
+
+                        <p>
+                            ${
+                                blog.author
+                                ? blog.author.email
+                                : ""
+                            }
+                        </p>
+
+                        <hr>
+
+                        <p>${blog.content}</p>
+
+                        <br>
+
+                        <p>
+                            <strong>Created:</strong>
+                            ${
+                                new Date(
+                                    blog.createdAt
+                                ).toLocaleString()
+                            }
+                        </p>
+
+                    </div>
+
+                    <br>
+
+                    <a href="index.html">
+                        ← Back to Home
+                    </a>
+
+                `;
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                container.innerHTML =
+                    "<p>Unable to load blog.</p>";
+
+            }
+
+        }
+
+
+        loadBlog();
+
+    </script>
+
+</body>
+
+</html>
